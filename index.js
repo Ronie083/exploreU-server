@@ -1,4 +1,4 @@
-const express = require ('express');
+const express = require('express');
 const app = express();
 const cors = require('cors');
 require('dotenv').config()
@@ -30,21 +30,31 @@ async function run() {
     const allInstructors = client.db("exploreUData").collection("instructors");
     const enrolledCart = client.db("exploreUData").collection("coursesCart");
 
-    app.get('/classes', async(req, res) => {
-        const result = await allClasses.find().toArray();
-        res.send(result)
+    app.get('/classes', async (req, res) => {
+      const result = await allClasses.find().toArray();
+      res.send(result)
     })
 
-    app.get('/instructors', async(req, res) => {
-        const result = await allInstructors.find().toArray();
-        res.send(result)
+    app.get('/instructors', async (req, res) => {
+      const result = await allInstructors.find().toArray();
+      res.send(result)
     })
-    
-    app.post('/enrolledCart', async(req, res) => {
-        const course = req.body;
-        console.log(course);
-        const result = await enrolledCart.insertOne(course);
-        res.send(result)
+
+    app.get('/enrolledCart', async (req, res) => {
+      const email = req.query.email;
+      if (!email) {
+        res.send([]);
+      }
+      const query = { email: email };
+      const result = await enrolledCart.find(query).toArray();
+      res.send(result);
+    })
+
+    app.post('/enrolledCart', async (req, res) => {
+      const course = req.body;
+      console.log(course);
+      const result = await enrolledCart.insertOne(course);
+      res.send(result)
     })
 
 
@@ -60,10 +70,10 @@ run().catch(console.dir);
 
 
 
-app.get('/', (req, res) =>{
-    res.send('ExploreU summer camp course data stored here')
+app.get('/', (req, res) => {
+  res.send('ExploreU summer camp course data stored here')
 })
 
 app.listen(port, () => {
-    console.log(`Explore-U data running on port ${port}`)
+  console.log(`Explore-U data running on port ${port}`)
 })
