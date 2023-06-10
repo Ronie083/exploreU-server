@@ -28,6 +28,7 @@ async function run() {
 
     const allClasses = client.db("exploreUData").collection("classes");
     const allInstructors = client.db("exploreUData").collection("instructors");
+    const enrolledCart = client.db("exploreUData").collection("coursesCart");
 
     app.get('/classes', async(req, res) => {
         const result = await allClasses.find().toArray();
@@ -36,6 +37,13 @@ async function run() {
 
     app.get('/instructors', async(req, res) => {
         const result = await allInstructors.find().toArray();
+        res.send(result)
+    })
+    
+    app.post('/enrolledCart', async(req, res) => {
+        const course = req.body;
+        console.log(course);
+        const result = await enrolledCart.insertOne(course);
         res.send(result)
     })
 
