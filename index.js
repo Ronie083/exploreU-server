@@ -26,9 +26,26 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
+    const allUsers = client.db("exploreUData").collection("users");
     const allClasses = client.db("exploreUData").collection("classes");
     const allInstructors = client.db("exploreUData").collection("instructors");
     const enrolledCart = client.db("exploreUData").collection("coursesCart");
+
+    app.get('/users', async (req, res) =>{
+      const result = await allUsers.find().toArray();
+      res.send(result);
+    })
+
+    app.post('/users', async (req, res) => {
+      const users = req.body;
+      const query = { email: users.email }
+      const existUser = await allUsers.findOne(query);
+      if (existUser) {
+        return res.send()
+      }
+      const result = await allUsers.insertOne(users);
+      res.send(result);
+    })
 
     app.get('/classes', async (req, res) => {
       const result = await allClasses.find().toArray();
