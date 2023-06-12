@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const cors = require('cors');
+var jwt = require('jsonwebtoken');
 require('dotenv').config()
 const port = process.env.PORT || 5000;
 
@@ -31,6 +32,14 @@ async function run() {
     const allInstructors = client.db("exploreUData").collection("instructors");
     const enrolledCart = client.db("exploreUData").collection("coursesCart");
 
+    app.post('/jwt', (req, res) => {
+      const user =req.body;
+      const jwtToken = jwt.sign(user, env.process.ACCESS_TOKEN_SECRET, {
+        expiresIn: '1h'
+      })
+      res.send({jwtToken})
+    })
+
     app.get('/users', async (req, res) =>{
       const result = await allUsers.find().toArray();
       res.send(result);
@@ -47,7 +56,7 @@ async function run() {
       res.send(result);
     })
 
-    app.patch('users/admin/:id', async(req, res) => {
+    app.patch('/users/admin/:id', async(req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id)};
       const updateDoc = {
@@ -58,6 +67,19 @@ async function run() {
       const result = await allUsers.updateOne(query, updateDoc);
       res.send(result)
     })
+
+    app.patch('/users/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          role: 'instructor'
+        },
+      };
+      const result = await allUsers.updateOne(query, updateDoc);
+      res.send(result);
+    });
+    
 
     app.get('/classes', async (req, res) => {
       const result = await allClasses.find().toArray();
