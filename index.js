@@ -1,8 +1,8 @@
 require('dotenv').config()
+var jwt = require('jsonwebtoken');
 const express = require('express');
 const app = express();
 const cors = require('cors');
-var jwt = require('jsonwebtoken');
 const stripe = require('stripe')(process.env.PAYMENT_SECRET_KEY)
 const port = process.env.PORT || 5000;
 
@@ -45,12 +45,13 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
 
     const allUsers = client.db("exploreUData").collection("users");
     const allClasses = client.db("exploreUData").collection("classes");
     const allInstructors = client.db("exploreUData").collection("instructors");
     const enrolledCart = client.db("exploreUData").collection("coursesCart");
+    const newClasses = client.db("exploreUData").collection("newClasses");
 
     app.post('/jwt', (req, res) => {
       const user = req.body;
@@ -147,6 +148,12 @@ async function run() {
       res.send(result)
     })
 
+    app.post('/newCourse', async (req, res) => {
+      const courseData = req.body;
+      const result = await newClasses.insertOne(courseData);
+      res.send(result)
+    })
+
     app.delete('/enrolledCart/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
@@ -170,7 +177,7 @@ async function run() {
 
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
+    // await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
