@@ -11,7 +11,7 @@ app.use(express.json());
 
 const verifyJWT = (req, res, next) => {
   const authorization = req.headers.authorization;
-  console.log(authorization)
+  // console.log(authorization)
   if (!authorization) {
     return res.status(401).send({ error: true, message: 'unauthorized access' });
   }
@@ -19,7 +19,7 @@ const verifyJWT = (req, res, next) => {
   const token = authorization.split(' ')[1];
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoder) => {
-    console.log(err, decoder)
+    // console.log(err, decoder)
     if (err) {
       return res.status(401).send({ error: true, message: 'unauthorized access' })
     }
@@ -123,6 +123,35 @@ async function run() {
       const result = await allInstructors.find().toArray();
       res.send(result)
     })
+
+    app.get('/newCourse', async (req, res) => {
+      const result = await newClasses.find().toArray();
+      res.send(result)
+    })
+
+    app.patch('/newCourse/:id/approve', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          courseStatus: 'Approved'
+        },
+      };
+      const result = await newClasses.updateOne(query, updateDoc);
+      res.send(result);
+    });
+
+    app.patch('/newCourse/:id/deny', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: {
+          courseStatus: 'Denied'
+        },
+      };
+      const result = await newClasses.updateOne(query, updateDoc);
+      res.send(result);
+    });
 
     app.get('/enrolledCart', verifyJWT, async (req, res) => {
       const email = req.query.email;
