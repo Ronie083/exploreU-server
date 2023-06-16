@@ -129,6 +129,19 @@ async function run() {
       res.send(result)
     })
 
+    app.patch('/newCourse/:id/feedback', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      console.log(query)
+      const updateDoc = {
+        $set: {
+          feedback: req.body.feedback
+        },
+      };
+      const result = await newClasses.updateOne(query, updateDoc);
+      res.send(result);
+    });
+
     app.patch('/newCourse/:id/approve', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
