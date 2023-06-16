@@ -66,6 +66,11 @@ async function run() {
       res.send(result);
     })
 
+    app.get('/usersSingle/:email', async (req, res) => {
+      const result = await allUsers.findOne({email:req.params.email})
+      res.send(result);
+    })
+
     app.post('/users', async (req, res) => {
       const users = req.body;
       const query = { email: users.email }
@@ -171,6 +176,7 @@ async function run() {
       if (!email) {
         res.send([]);
       }
+      
 
       const decodedEmail = req.decoder.email;
       if (email !== decodedEmail) {
